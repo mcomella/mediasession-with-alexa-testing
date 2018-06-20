@@ -37,23 +37,24 @@ class MainActivity : AppCompatActivity() {
 
 //        initWebView(wv)
         initMediaSessionCompat()
+
+        requestAudioFocus()
     }
 
-    override fun onStart() {
-        super.onStart()
-
+    private fun requestAudioFocus() {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         listener = AudioManager.OnAudioFocusChangeListener { Log.d("lol", "audioChangeListener: $it") }
         val granted = audioManager.requestAudioFocus(listener, STREAM_MUSIC, AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
         Log.d("lol", "granted: $granted")
+    }
 
-        mediaSessionCompat.isActive = true
+    override fun onStart() {
+        super.onStart()
     }
 
     override fun onStop() {
         super.onStop()
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).abandonAudioFocus(listener)
-
         mediaSessionCompat.isActive = false
     }
 
@@ -87,6 +88,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPlay() {
                 Log.d("lol", "onPlay")
+//                requestAudioFocus()
+                mediaSessionCompat.isActive = true
                 mediaSessionCompat.setPlaybackState(PlaybackStateCompat.Builder()
                         .setActions(SUPPORTED_ACTIONS)
                         .setState(PlaybackStateCompat.STATE_PLAYING,
